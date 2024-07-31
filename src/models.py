@@ -7,12 +7,13 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-from enum import Enum
+from enum import Enum as PyEnum
 
-class Type(Enum):
-    BMP = 'bmp'
-    JPG = 'jpg'
-    TIFF = 'tiff'
+class Type(PyEnum):
+    
+    SHORT = 'short'
+    LONG = 'long'
+    REALLY_LONG = 'really_long'
 
 class User(Base):
     __tablename__ = 'user'
@@ -35,14 +36,15 @@ class Comment(Base):
     comment_text = Column(String(250))
     author_id = Column(Integer, ForeignKey('user.id'))
     post_id = Column(Integer, ForeignKey('post.id'))
-    user = relationship(User)
+    user = relationship(User, foreign_keys=[author_id])
     post = relationship(Post)
 
 class Follower(Base):
     __tablename__ = 'follower'
-    user_from_id = Column(Integer, ForeignKey('user.id'))
-    user_to_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship(User)
+    user_from_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    user_to_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
+    user_from = relationship(User, foreign_keys=[user_from_id], backref="following")
+    user_to = relationship(User, foreign_keys=[user_to_id], backref="followers")
 
 class Media(Base):
     __tablename__ = 'media'
