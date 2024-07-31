@@ -1,11 +1,18 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy import create_engine
 from eralchemy2 import render_er
 
 Base = declarative_base()
+
+from enum import Enum
+
+class Type(Enum):
+    BMP = 'bmp'
+    JPG = 'jpg'
+    TIFF = 'tiff'
 
 class User(Base):
     __tablename__ = 'user'
@@ -31,7 +38,19 @@ class Comment(Base):
     user = relationship(User)
     post = relationship(Post)
 
+class Follower(Base):
+    __tablename__ = 'follower'
+    user_from_id = Column(Integer, ForeignKey('user.id'))
+    user_to_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
+class Media(Base):
+    __tablename__ = 'media'
+    id = Column(Integer, primary_key=True)
+    type = Column(Enum(Type), nullable=False)    
+    url = Column(String(250))
+    post_id = Column(Integer, ForeignKey('post.id'))
+    post = relationship(Post)
 
 
 ## Draw from SQLAlchemy base
